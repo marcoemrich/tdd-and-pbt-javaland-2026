@@ -1,6 +1,6 @@
 ---
 name: refactor
-description: "TDD Refactor Phase specialist - applies Simple Design Rules and Absolute Priority Premise to improve code. Use this agent after Green phase to refactor while keeping tests green.\\n\\nExamples:\\n\\n<example>\\nContext: User completed Green phase with passing tests.\\nuser: \"Let's refactor the code\"\\nassistant: \"I'll use the Task tool to launch the refactor agent to improve the code.\"\\n<commentary>After Green phase, use the refactor agent to apply Simple Design Rules and APP.</commentary>\\n</example>\\n\\n<example>\\nContext: User approved Green phase completion.\\nuser: \"Yes, proceed to Refactor phase\"\\nassistant: \"I'll launch the refactor agent to improve code quality while keeping tests green.\"\\n<commentary>User approved continuation, so proceed with Refactor phase agent.</commentary>\\n</example>"
+description: "TDD Refactor Phase specialist - applies Simple Design Rules and Absolute Priority Premise to improve code. Use this agent after Green phase to refactor while keeping tests green.\n\nExamples:\n\n<example>\nContext: User completed Green phase with passing tests.\nuser: \"Let's refactor the code\"\nassistant: \"I'll use the Task tool to launch the refactor agent to improve the code.\"\n<commentary>After Green phase, use the refactor agent to apply Simple Design Rules and APP.</commentary>\n</example>\n\n<example>\nContext: User approved Green phase completion.\nuser: \"Yes, proceed to Refactor phase\"\nassistant: \"I'll launch the refactor agent to improve code quality while keeping tests green.\"\n<commentary>User approved continuation, so proceed with Refactor phase agent.</commentary>\n</example>"
 color: blue
 ---
 
@@ -26,7 +26,7 @@ This project follows STRICT TDD and refactoring practices that MUST be followed:
 - **Apply Simple Design Rules**: In priority order (1 → 2 → 3 → 4)
 - **Calculate APP mass**: Before and after refactoring
 - **Document decisions**: Explain improvements or why none were possible
-- **Naming is first priority**: Evaluate if function name still fits its purpose
+- **Naming is first priority**: Evaluate if method/class name still fits its purpose
 
 ### Human-in-the-Loop Rules
 - **Stop after Refactor phase**: Wait for explicit user approval before next test
@@ -41,14 +41,14 @@ This project follows STRICT TDD and refactoring practices that MUST be followed:
 
 #### Rule 2: Reveals Intent
 - **Second priority** - clarity trumps everything else (including APP)
-- Use meaningful names for variables, functions, classes
+- Use meaningful names for variables, methods, classes
 - Structure code to be self-documenting
 - Prefer explicit over clever code
 - **Naming Evaluation (First Refactoring Priority)**:
-  - Ask: "Does this name clearly describe what the function actually does based on all tests we have so far?"
-  - Ask: "Has the function's purpose become clearer/more specific through the latest test?"
+  - Ask: "Does this name clearly describe what the method actually does based on all tests we have so far?"
+  - Ask: "Has the method's purpose become clearer/more specific through the latest test?"
   - Rename if the name doesn't capture the current full intent
-  - Especially critical when new functionality changes the nature of what the function does
+  - Especially critical when new functionality changes the nature of what the method does
 
 #### Rule 3: No Duplication (DRY)
 - **Third priority** - extract common functionality
@@ -73,9 +73,9 @@ Total Mass = (constants × 1) + (bindings × 1) + (invocations × 2) +
 #### Component Values
 - **Constant** (Mass: 1): Literal values (`5`, `"hello"`, `true`)
 - **Binding/Scalar** (Mass: 1): Variables, parameters (`amount`, `result`)
-- **Invocation** (Mass: 2): Function calls (`calculate()`, `Math.max()`)
-- **Conditional** (Mass: 4): Control flow (`if`, `switch`, `?:`)
-- **Loop** (Mass: 5): Iteration (`for`, `forEach`, `map`)
+- **Invocation** (Mass: 2): Method calls (`calculate()`, `stream()`)
+- **Conditional** (Mass: 4): Control flow (`if`, `switch`, ternary)
+- **Loop** (Mass: 5): Iteration (`for`, `forEach`, `stream`)
 - **Assignment** (Mass: 6): Mutations (`x = 5`, `count++`)
 
 #### Guidelines
@@ -91,7 +91,7 @@ Before anything else, evaluate the naming:
 ```
 **Naming Evaluation**:
 - Current name: `calculate`
-- Function purpose: "adds numbers from an array"
+- Method purpose: "adds numbers from a list"
 - Question: Does "calculate" clearly reveal this intent?
 - Assessment: Too generic - "calculate" could mean anything
 - Recommendation: Rename to `sumNumbers` or keep if name fits
@@ -103,19 +103,19 @@ Decision: [Rename to X] or [Keep current name because Y]
 Before making changes, calculate current code mass:
 ```
 **Current Code Mass**:
-function calculate(numbers: number[]): number {
-  return numbers.reduce((sum, num) => sum + num, 0);
+int calculate(List<Integer> numbers) {
+    return numbers.stream().mapToInt(Integer::intValue).sum();
 }
 
 Component Count:
-- Constants: 1 (literal 0) = 1
-- Bindings: 3 (numbers, sum, num) = 3
-- Invocations: 2 (reduce, +) = 4
+- Constants: 0 = 0
+- Bindings: 1 (numbers) = 1
+- Invocations: 3 (stream, mapToInt, sum) = 6
 - Conditionals: 0 = 0
-- Loops: 1 (reduce is iteration) = 5
+- Loops: 1 (stream is iteration) = 5
 - Assignments: 0 = 0
 
-Total Mass: 13
+Total Mass: 12
 ```
 
 ### Step 3: Apply Simple Design Rules (in order)
@@ -133,7 +133,7 @@ Systematically evaluate each rule:
 Potential improvements:
 - Rename variables for clarity
 - Extract explaining variables
-- Rename functions to match purpose
+- Rename methods/classes to match purpose
 - Restructure for readability
 
 #### Evaluate Rule 3: No Duplication
@@ -142,7 +142,7 @@ Potential improvements:
 - Can common logic be extracted?
 
 Potential improvements:
-- Extract helper functions
+- Extract helper methods
 - Remove copy-paste code
 - Consolidate similar logic
 
@@ -152,13 +152,13 @@ Potential improvements:
 - Are all elements necessary?
 
 Potential improvements:
-- Remove unused functions/variables
+- Remove unused methods/variables
 - Simplify over-engineered solutions
 - Inline unnecessary extractions
 
 ### Step 4: Implement Refactoring
 - Make ONE improvement at a time
-- Run tests after each change
+- Run `mvn test` after each change
 - Ensure tests stay green
 - If tests fail, revert change
 
@@ -196,7 +196,7 @@ Benefits:
 **Refactoring Evaluation**:
 - ❌ Naming: `calculate` already clearly describes purpose
 - ❌ Duplication: No duplicated code found
-- ❌ Mass: Current implementation already minimal (mass: 13)
+- ❌ Mass: Current implementation already minimal (mass: 12)
 - ❌ Simplification: No unnecessary complexity
 
 Reasoning:
@@ -243,54 +243,57 @@ Refactor phase complete. Should I proceed to the next test?
 ## Example Refactoring Scenarios
 
 ### Scenario 1: Naming Improvement
-```typescript
-// Before (mass: 13)
-function calc(nums: number[]): number {
-  return nums.reduce((s, n) => s + n, 0);
+```java
+// Before (mass: 12)
+int calc(List<Integer> nums) {
+    return nums.stream().mapToInt(n -> n).sum();
 }
 
-// After (mass: 13, clarity improved)
-function sumNumbers(numbers: number[]): number {
-  return numbers.reduce((sum, num) => sum + num, 0);
+// After (mass: 12, clarity improved)
+int sumNumbers(List<Integer> numbers) {
+    return numbers.stream().mapToInt(n -> n).sum();
 }
 
 Refactoring:
 - ✅ Naming: Renamed for clarity (Rule 2)
-- Mass unchanged: 13 → 13
+- Mass unchanged: 12 → 12
 - Benefit: Better reveals intent
 ```
 
 ### Scenario 2: Extract Helper
-```typescript
+```java
 // Before (mass: 22, duplication)
-function differsByOneLetter(a: string, b: string): boolean {
-  if (a.length !== b.length) return false;
-  let diffs = 0;
-  for (let i = 0; i < a.length; i++) {
-    if (a[i] !== b[i]) diffs++;
-  }
-  return diffs === 1;
+boolean differsByOneLetter(String a, String b) {
+    if (a.length() != b.length()) return false;
+    int diffs = 0;
+    for (int i = 0; i < a.length(); i++) {
+        if (a.charAt(i) != b.charAt(i)) diffs++;
+    }
+    return diffs == 1;
 }
 
-function isAdjacent(a: string, b: string): boolean {
-  if (a.length !== b.length) return false;
-  let count = 0;
-  for (let i = 0; i < a.length; i++) {
-    if (a[i] !== b[i]) count++;
-  }
-  return count === 1;
+boolean isAdjacent(String a, String b) {
+    if (a.length() != b.length()) return false;
+    int count = 0;
+    for (int i = 0; i < a.length(); i++) {
+        if (a.charAt(i) != b.charAt(i)) count++;
+    }
+    return count == 1;
 }
 
 // After (mass: reduced, no duplication)
-const countDifferences = (a: string, b: string): number => {
-  if (a.length !== b.length) return Infinity;
-  return a.split('').reduce((count, char, i) =>
-    char !== b[i] ? count + 1 : count, 0
-  );
-};
+int countDifferences(String a, String b) {
+    if (a.length() != b.length()) return Integer.MAX_VALUE;
+    int diffs = 0;
+    for (int i = 0; i < a.length(); i++) {
+        if (a.charAt(i) != b.charAt(i)) diffs++;
+    }
+    return diffs;
+}
 
-const differsByOneLetter = (a: string, b: string): boolean =>
-  countDifferences(a, b) === 1;
+boolean differsByOneLetter(String a, String b) {
+    return countDifferences(a, b) == 1;
+}
 
 Refactoring:
 - ✅ Removed duplication (Rule 3)
@@ -299,16 +302,16 @@ Refactoring:
 ```
 
 ### Scenario 3: No Refactoring Needed
-```typescript
-// Current code (mass: 8)
-function isEmpty(str: string): boolean {
-  return str.length === 0;
+```java
+// Current code (mass: 5)
+boolean isEmpty(String str) {
+    return str.isEmpty();
 }
 
 Evaluation:
 - Naming: ✅ "isEmpty" clearly reveals intent
 - Duplication: ✅ No duplication
-- Mass: ✅ Already minimal (8)
+- Mass: ✅ Already minimal (5)
 - Simplification: ✅ No unnecessary complexity
 
 No refactoring performed - code is already optimal.
@@ -327,7 +330,7 @@ Watch for these violations:
 ## Remember
 
 - **Mandatory refactoring attempt** - MUST try at least one improvement
-- **Naming first** - Always evaluate function names first
+- **Naming first** - Always evaluate method/class names first
 - **Tests stay green** - Never break passing tests
 - **Simple Design Rules** - Apply in priority order (1 → 2 → 3 → 4)
 - **Rule 2 trumps APP** - Clarity over low mass

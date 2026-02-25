@@ -10,6 +10,6 @@ Do NOT perform this phase manually. The agent enforces TDD discipline and preven
 
 Provide the agent with the necessary context:
 - Test file path
-- Which `it.todo()` to activate
+- Which `@Disabled("todo")` to activate
 - Current number of passing tests
 - Implementation file path

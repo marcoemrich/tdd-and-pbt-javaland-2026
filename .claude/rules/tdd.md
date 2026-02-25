@@ -46,14 +46,14 @@ Task({
   subagent_type: "test-list",
   prompt: `
     Feature: String Calculator
-    Test file: src/calculator.spec.ts
-    Implementation file: src/calculator.ts
+    Test file: src/test/java/CalculatorTest.java
+    Implementation file: src/main/java/Calculator.java
     Requirements: Parse comma-separated numbers and return sum
   `
 })
 ```
 
-The agent will create a comprehensive test list using `it.todo()` for BASE FUNCTIONALITY ONLY:
+The agent will create a comprehensive test list using `@Disabled("todo")` for BASE FUNCTIONALITY ONLY:
 - Focus on core behavior, not advanced features
 - Order tests from simple → complex
 - No implementation yet
@@ -74,16 +74,16 @@ The agent will create a comprehensive test list using `it.todo()` for BASE FUNCT
 Task({
   subagent_type: "red",
   prompt: `
-    Test file: src/calculator.spec.ts
-    Activate test: "should return sum for two numbers" (line 12)
+    Test file: src/test/java/CalculatorTest.java
+    Activate test: "shouldReturnSumForTwoNumbers" (line 12)
     Current state: 2 tests passing
-    Implementation file: src/calculator.ts
+    Implementation file: src/main/java/Calculator.java
   `
 })
 ```
 
 The agent will activate exactly ONE test and make it fail:
-- Convert one `it.todo()` to executable test
+- Convert one `@Disabled("todo")` to executable test
 - Make explicit predictions (Guessing Game)
 - Verify compilation error, then runtime error
 - **Stop and wait for approval** before Green phase
@@ -104,11 +104,11 @@ The agent will activate exactly ONE test and make it fail:
 Task({
   subagent_type: "green",
   prompt: `
-    Test file: src/calculator.spec.ts
-    Failing test: "should return sum for two numbers"
+    Test file: src/test/java/CalculatorTest.java
+    Failing test: "shouldReturnSumForTwoNumbers"
     Expected: add("1,2") returns 3
-    Current error: Expected 3, Received undefined
-    Implementation file: src/calculator.ts
+    Current error: expected: <3> but was: <0>
+    Implementation file: src/main/java/Calculator.java
   `
 })
 ```
@@ -137,10 +137,10 @@ The agent will implement minimal code to make the test pass:
 Task({
   subagent_type: "refactor",
   prompt: `
-    Test file: src/calculator.spec.ts
-    Implementation file: src/calculator.ts
+    Test file: src/test/java/CalculatorTest.java
+    Implementation file: src/main/java/Calculator.java
     Passing tests: 3
-    Recent Green phase: Added split/map/reduce for comma parsing
+    Recent Green phase: Added split/stream for comma parsing
 
     Refactor the implementation while keeping all tests green.
   `
@@ -210,24 +210,23 @@ See `@.claude/rules/human-in-the-loop.md` for detailed checkpoint requirements.
 
 ## Technical Setup
 
-See `@.claude/rules/tdd_with_ts_and_vitest.md` for TypeScript and Vitest configuration.
+See `@.claude/rules/tdd_with_java_and_junit.md` for Java and JUnit configuration.
 
 ## Running Tests - CRITICAL
 
-**🚨 TDD agents MUST use npm scripts from `package.json`**
+**🚨 TDD agents MUST use Maven goals from `pom.xml`**
 
 ### Correct Test Execution:
-- ✅ `npm test` - Run all tests
-- ✅ `npm run test:watch` - Run tests in watch mode
+- ✅ `mvn test` - Run all tests
 
 ### NEVER use:
-- ❌ `npx vitest` - Don't call vitest directly
-- ❌ `vitest --run SomeFile.spec.ts` - Don't call test files directly
-- ❌ Individual test file execution - Always use npm scripts
+- ❌ `java -jar junit-platform-standalone.jar` - Don't run JUnit directly
+- ❌ `mvn exec:java -Dexec.mainClass=...` - Don't invoke test runner manually
+- ❌ Individual test class execution - Always use Maven goals
 
-**Why**: npm scripts provide a consistent interface. Direct vitest calls skip the centralized configuration.
+**Why**: Maven goals provide a consistent interface. Direct JUnit invocation skips centralized configuration.
 
-See `@.claude/rules/tdd_with_ts_and_vitest.md` for complete details.
+See `@.claude/rules/tdd_with_java_and_junit.md` for complete details.
 
 ## Remember
 
