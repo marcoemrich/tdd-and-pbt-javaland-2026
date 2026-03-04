@@ -2,10 +2,18 @@
 
 ## Test File Creation
 1. **Create test class** in `src/test/java/` mirroring the production package structure
-2. **Name test classes** with `Test` suffix (e.g., `CalculatorTest`)
-3. **Use JUnit 6 annotations** (`@Test`, `@Disabled`, `@DisplayName`)
-4. **Follow TDD red-green-refactor** cycle
-5. **Leverage Java's type checking** during development
+2. **Use JUnit 6 annotations** (`@Test`, `@Disabled`, `@DisplayName`)
+3. **Follow TDD red-green-refactor** cycle
+4. **Leverage Java's type checking** during development
+
+## Naming Conventions
+
+| Type | Class Suffix | Example | Annotations |
+|------|-------------|---------|-------------|
+| TDD / Unit Tests | `*Test` | `CalculatorTest.java` | `@Test`, `@Disabled` |
+| Property-Based Tests | `*Properties` | `CalculatorProperties.java` | `@Property`, `@ForAll` |
+
+Both are picked up automatically by Maven Surefire (see includes config below).
 
 ## Running Tests - CRITICAL REQUIREMENTS
 
@@ -33,7 +41,7 @@ mvn exec:java -Dexec.mainClass=...        # Don't invoke test runner manually
 
 **IMPORTANT**: When TDD agents run tests, they MUST use `mvn test`, never invoke JUnit directly.
 
-## Example Test Template
+## Example Test Template (TDD)
 ```java
 // src/test/java/com/example/CalculatorTest.java
 import org.junit.jupiter.api.Disabled;
@@ -54,6 +62,28 @@ class CalculatorTest {
     @Test
     @Disabled("todo")
     void shouldHandleEdgeCases() {}
+}
+```
+
+## Example Property Template (PBT)
+```java
+// src/test/java/com/example/CalculatorProperties.java
+import net.jqwik.api.Disabled;
+import net.jqwik.api.ForAll;
+import net.jqwik.api.Property;
+import net.jqwik.api.constraints.IntRange;
+
+import static org.assertj.core.api.Assertions.assertThat;
+
+class CalculatorProperties {
+
+    @Property
+    @Disabled("todo")
+    void additionIsCommutative(@ForAll int a, @ForAll int b) {}
+
+    @Property
+    @Disabled("todo")
+    void addingZeroIsIdentity(@ForAll int a) {}
 }
 ```
 
@@ -80,6 +110,12 @@ assertThat(thrown).isInstanceOf(IllegalArgumentException.class);
         <version>3.26.3</version>
         <scope>test</scope>
     </dependency>
+    <dependency>
+        <groupId>net.jqwik</groupId>
+        <artifactId>jqwik</artifactId>
+        <version>1.9.3</version>
+        <scope>test</scope>
+    </dependency>
 </dependencies>
 
 <build>
@@ -88,6 +124,13 @@ assertThat(thrown).isInstanceOf(IllegalArgumentException.class);
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-surefire-plugin</artifactId>
             <version>3.3.1</version>
+            <configuration>
+                <includes>
+                    <include>**/*Test.java</include>
+                    <include>**/*Tests.java</include>
+                    <include>**/*Properties.java</include>
+                </includes>
+            </configuration>
         </plugin>
     </plugins>
 </build>
