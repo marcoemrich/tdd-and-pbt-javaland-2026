@@ -2,6 +2,7 @@ package com.example;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 class PixelArtScaler {
@@ -14,11 +15,9 @@ class PixelArtScaler {
     }
 
     private String scaleHorizontally(String row, int scaleFactor) {
-        StringBuilder result = new StringBuilder();
-        for (char c : row.toCharArray()) {
-            result.append(String.valueOf(c).repeat(scaleFactor));
-        }
-        return result.toString();
+        return row.chars()
+                .mapToObj(c -> String.valueOf((char) c).repeat(scaleFactor))
+                .collect(Collectors.joining());
     }
 
     private Stream<String> scaleVertically(String row, int scaleFactor) {
