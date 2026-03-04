@@ -1,0 +1,8 @@
+target/
+.jqwik-database
+*.class
+*.jar
+*.log
+.idea/
+*.iml
+.DS_Store
